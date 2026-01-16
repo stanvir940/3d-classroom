@@ -19,8 +19,8 @@ void main()
         return;
     }
 
-    // Ambient (kept low so object hue shows)
-    float ambientStrength = 0.15;
+    // Ambient (increased for brighter overall illumination)
+    float ambientStrength = 0.45;
     vec3 ambient = ambientStrength * lightColor;
 
     // Diffuse

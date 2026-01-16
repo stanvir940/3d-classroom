@@ -56,12 +56,11 @@ void drawCube(Shader& shader, unsigned int VAO,
     model = glm::rotate(model, glm::radians(rot.y), glm::vec3(0,1,0));
     model = glm::rotate(model, glm::radians(rot.z), glm::vec3(0,0,1));
     model = glm::scale(model, scale);
-    model = glm::translate(model, glm::vec3(-0.25f));
 
     shader.setMat4("model", model);
     shader.setVec3("objectColor", color);
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 // ---------------- CLASSROOM OBJECTS ----------------
@@ -82,8 +81,8 @@ void drawChair(Shader& shader, unsigned int VAO, glm::vec3 pos, float rotation =
     // Seat
     drawCube(shader, VAO, pos + glm::vec3(0, 0.5f, 0), {0, rotation, 0}, {0.8f, 0.1f, 0.8f}, {0.2f, 0.2f, 0.8f});
     
-    // Backrest
-    drawCube(shader, VAO, pos + glm::vec3(0, 0.9f, -0.35f), {0, rotation, 0}, {0.8f, 0.7f, 0.1f}, {0.2f, 0.2f, 0.8f});
+    // Backrest (moved to front so chair faces positive Z)
+    drawCube(shader, VAO, pos + glm::vec3(0, 0.9f, 0.35f), {0, rotation, 0}, {0.8f, 0.7f, 0.1f}, {0.2f, 0.2f, 0.8f});
     
     // Legs
     drawCube(shader, VAO, pos + glm::vec3(-0.3f, 0.25f, -0.3f), {0, rotation, 0}, {0.1f, 0.5f, 0.1f}, {0.15f, 0.15f, 0.6f});
@@ -184,35 +183,73 @@ int main()
 
     Shader shader("vertexShader.vs", "fragmentShader.fs");
 
-    // ----------- CUBE DATA ----------
+    // ----------- CUBE DATA (position, normal, color) ----------
     float vertices[] = {
-        0,0,0, 1,0,0,   0.5,0,0, 0,1,0,   0.5,0.5,0, 0,0,1,   0,0.5,0, 1,1,0,
-        0,0,0.5, 1,0,1, 0.5,0,0.5, 0,1,1, 0.5,0.5,0.5, 1,1,1, 0,0.5,0.5, 0,1,0
+        // Front face
+        -0.5f,-0.5f, 0.5f,  0.0f,0.0f,1.0f,  1.0f,1.0f,1.0f,
+         0.5f,-0.5f, 0.5f,  0.0f,0.0f,1.0f,  1.0f,1.0f,1.0f,
+         0.5f, 0.5f, 0.5f,  0.0f,0.0f,1.0f,  1.0f,1.0f,1.0f,
+        -0.5f,-0.5f, 0.5f,  0.0f,0.0f,1.0f,  1.0f,1.0f,1.0f,
+         0.5f, 0.5f, 0.5f,  0.0f,0.0f,1.0f,  1.0f,1.0f,1.0f,
+        -0.5f, 0.5f, 0.5f,  0.0f,0.0f,1.0f,  1.0f,1.0f,1.0f,
+
+        // Back face
+         0.5f,-0.5f,-0.5f,  0.0f,0.0f,-1.0f, 1.0f,1.0f,1.0f,
+        -0.5f,-0.5f,-0.5f,  0.0f,0.0f,-1.0f, 1.0f,1.0f,1.0f,
+        -0.5f, 0.5f,-0.5f,  0.0f,0.0f,-1.0f, 1.0f,1.0f,1.0f,
+         0.5f,-0.5f,-0.5f,  0.0f,0.0f,-1.0f, 1.0f,1.0f,1.0f,
+        -0.5f, 0.5f,-0.5f,  0.0f,0.0f,-1.0f, 1.0f,1.0f,1.0f,
+         0.5f, 0.5f,-0.5f,  0.0f,0.0f,-1.0f, 1.0f,1.0f,1.0f,
+
+        // Left face
+        -0.5f,-0.5f,-0.5f, -1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+        -0.5f,-0.5f, 0.5f, -1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+        -0.5f, 0.5f, 0.5f, -1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+        -0.5f,-0.5f,-0.5f, -1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+        -0.5f, 0.5f, 0.5f, -1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+        -0.5f, 0.5f,-0.5f, -1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+
+        // Right face
+         0.5f,-0.5f, 0.5f,  1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+         0.5f,-0.5f,-0.5f,  1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+         0.5f, 0.5f,-0.5f,  1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+         0.5f,-0.5f, 0.5f,  1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+         0.5f, 0.5f,-0.5f,  1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+         0.5f, 0.5f, 0.5f,  1.0f,0.0f,0.0f,  1.0f,1.0f,1.0f,
+
+        // Top face
+        -0.5f, 0.5f, 0.5f,  0.0f,1.0f,0.0f,  1.0f,1.0f,1.0f,
+         0.5f, 0.5f, 0.5f,  0.0f,1.0f,0.0f,  1.0f,1.0f,1.0f,
+         0.5f, 0.5f,-0.5f,  0.0f,1.0f,0.0f,  1.0f,1.0f,1.0f,
+        -0.5f, 0.5f, 0.5f,  0.0f,1.0f,0.0f,  1.0f,1.0f,1.0f,
+         0.5f, 0.5f,-0.5f,  0.0f,1.0f,0.0f,  1.0f,1.0f,1.0f,
+        -0.5f, 0.5f,-0.5f,  0.0f,1.0f,0.0f,  1.0f,1.0f,1.0f,
+
+        // Bottom face
+        -0.5f,-0.5f,-0.5f,  0.0f,-1.0f,0.0f, 1.0f,1.0f,1.0f,
+         0.5f,-0.5f,-0.5f,  0.0f,-1.0f,0.0f, 1.0f,1.0f,1.0f,
+         0.5f,-0.5f, 0.5f,  0.0f,-1.0f,0.0f, 1.0f,1.0f,1.0f,
+        -0.5f,-0.5f,-0.5f,  0.0f,-1.0f,0.0f, 1.0f,1.0f,1.0f,
+         0.5f,-0.5f, 0.5f,  0.0f,-1.0f,0.0f, 1.0f,1.0f,1.0f,
+        -0.5f,-0.5f, 0.5f,  0.0f,-1.0f,0.0f, 1.0f,1.0f,1.0f
     };
 
-    unsigned int indices[] = {
-        0,1,2, 2,3,0,
-        1,5,6, 6,2,1,
-        5,4,7, 7,6,5,
-        4,0,3, 3,7,4,
-        3,2,6, 6,7,3,
-        4,5,1, 1,0,4
-    };
-
-    unsigned int VAO, VBO, EBO;
+    unsigned int VAO, VBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+    // position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
+    // normal
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    // color
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     // ---------------- RENDER LOOP ----------------
     while (!glfwWindowShouldClose(window))
@@ -247,6 +284,10 @@ int main()
                             (float)SCR_WIDTH/SCR_HEIGHT, 0.1f, 100.0f);
         shader.setMat4("projection", projection);
         shader.setMat4("view", camera.createViewMatrix());
+        // lighting
+        shader.setVec3("lightDir", glm::vec3(-0.3f, -1.0f, -0.2f));
+        shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 0.95f));
+        shader.setVec3("viewPos", camera.eye);
 
         // ========== ROOM STRUCTURE ==========
         // Floor
